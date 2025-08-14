@@ -1,0 +1,81 @@
+思路：
+ 1. 分别进行三次独立的双重循环：第一次检查所有行，第二次检查所有列，第三次检查所有3x3子网格。
+ 2. 在每一行/列/子网格的检查中，使用一个长度为9的布尔数组，记录数字1-9是否出现。注意：字符需要转换为数字索引（0-8）。
+ 3. 遇到数字时，检查该数字对应的索引在布尔数组中是否已经为true，如果是，则返回false；否则设置为true。
+ 4. 如果所有检查都通过，则返回true。
+代码：class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        bool row[9][9] = {false}; // 记录每行数字出现情况
+        bool col[9][9] = {false}; // 记录每列数字出现情况
+        bool box[9][9] = {false}; // 记录每个3x3子网格数字出现情况
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] == '.') continue; // 跳过空格
+                
+                int num = board[i][j] - '1'; // 将字符转换为0-8的数字索引
+                int box_index = (i / 3) * 3 + j / 3; // 计算3x3子网格索引
+                
+                // 检查当前数字是否已在行、列或子网格中出现过
+                if (row[i][num] || col[j][num] || box[box_index][num]) {
+                    return false;
+                }
+                
+                // 标记数字出现
+                row[i][num] = true;
+                col[j][num] = true;
+                box[box_index][num] = true;
+            }
+        }
+        return true; // 所有检查通过
+    }
+};
+
+初始化记录数组
+cpp
+bool row[9][9] = {false}; // 9行，每行9个数字（1-9）
+bool col[9][9] = {false}; // 9列，每列9个数字
+bool box[9][9] = {false}; // 9个子网格，每个网格9个数字
+初始化三个9x9布尔数组，初始值均为false。
+
+row[i][num]表示数字num是否在第i行出现过。
+
+遍历数独板
+cpp
+for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+        if (board[i][j] == '.') continue; // 跳过空格
+双重循环遍历数独板的每个单元格。
+
+遇到空格（.）时跳过后续处理。
+
+数字转换与子网格索引计算
+cpp
+int num = board[i][j] - '1'; // 字符转数字索引（'1'->0, '2'->1,..., '9'->8）
+int box_index = (i / 3) * 3 + j / 3; // 计算3x3子网格索引
+board[i][j] - '1'：将字符数字转换为0-8的整数索引（例如'5'转换为4）。
+
+box_index计算：
+
+i/3和j/3确定3x3子网格的行列编号（0-2）。
+
+(i/3)*3将行编号映射到0、3、6（每3行为一组）。
+
++ j/3添加列偏移量（0-2）。
+
+例如(2,5) -> (0*3)+1 = 1，(7,3) -> (2*3)+1 = 7。
+
+重复检查与标记
+cpp
+if (row[i][num] || col[j][num] || box[box_index][num]) {
+    return false; // 数字已在行/列/子网格中出现过
+}
+row[i][num] = true;
+col[j][num] = true;
+box[box_index][num] = true;
+检查当前数字是否在对应的行、列或子网格中已出现过。
+
+若任一条件为真，说明数独无效，立即返回false。
+
+若未出现过，则在三个数组中标记该数字已出现。
