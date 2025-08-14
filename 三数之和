@@ -1,0 +1,94 @@
+ 思路：
+ 1. 首先对数组进行排序，这样我们可以使用双指针技巧并避免重复。
+ 2. 遍历数组，对于每个元素nums[i]，我们将其作为三元组的第一个元素。
+ 3. 为了避免重复的三元组，如果当前元素和前一个元素相同，则跳过（因为相同的数字会产生相同的三元组）。
+ 4. 然后，我们使用两个指针（l和r）分别指向i+1和数组末尾，在l<r的条件下，寻找两个数，使得它们的和等于-nums[i]（即0-nums[i]）。
+ 5. 在双指针移动过程中：
+    a. 如果nums[l] + nums[r]等于目标值k，则找到一个三元组，将其加入答案。
+       然后为了避免重复，我们同时移动l和r，跳过所有与当前nums[l]和nums[r]相同的元素，最后再将l和r分别移动一次（因为当前已经匹配，下一次需要新的数）。
+    b. 如果和小于k，则左指针l右移（因为数组有序，右移会增大和）。
+    c. 如果和大于k，则右指针r左移（减小和）。
+ 6. 最后返回所有满足条件的三元组。
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> ans;
+        sort(nums.begin(), nums.end());  //排序使双指针可行
+        
+        for (int i = 0; i < nums.size(); i++) {
+            // 提前终止（固定数>0时后续无解）
+            if (nums[i] > 0) break;  
+            
+            // 优化点2：跳过重复固定数
+            if (i > 0 && nums[i] == nums[i-1]) continue;
+            
+            int l = i + 1, r = nums.size() - 1;  // 双指针初始化
+            while (l < r) {
+                int sum = nums[i] + nums[l] + nums[r];  // 实时计算三数和
+                
+                if (sum == 0) {
+                    ans.push_back({nums[i], nums[l], nums[r]});
+                    // 跳过所有重复的左/右指针值
+                    while (l < r && nums[l] == nums[l+1]) l++;
+                    while (l < r && nums[r] == nums[r-1]) r--;
+                    l++; r--;  // 移动指针寻找新组合
+                } 
+                else if (sum < 0) l++;  // 和太小则左指针右移
+                else r--;  // 和太大则右指针左移
+            }
+        }
+        return ans;
+    }
+};
+1.排序预处理
+sort(nums.begin(), nums.end());
+
+使数组有序，为双指针创造条件
+
+时间复杂度 O(n log n)
+
+2.主循环遍历固定数
+for (int i = 0; i < nums.size(); i++)
+
+遍历每个元素作为三元组的第一个固定数
+
+3.提前终止优化
+if (nums[i] > 0) break;
+
+当固定数 > 0 时，因数组已排序，后续元素均 > 0，不可能组成三数和为0
+
+4.固定数去重
+if (i > 0 && nums[i] == nums[i-1]) continue;
+
+跳过连续相同的固定数，避免重复解
+
+5.双指针核心逻辑
+
+cpp
+int l = i + 1, r = nums.size() - 1;
+while (l < r) {
+    int sum = nums[i] + nums[l] + nums[r];
+    // ... 处理三种情况
+}
+l 从固定数右侧开始，r 从数组末尾开始
+
+6.实时计算三数和 sum
+
+找到有效解的三种操作
+
+cpp
+if (sum == 0) {
+    ans.push_back({nums[i], nums[l], nums[r]});
+    while (l < r && nums[l] == nums[l+1]) l++;  // 跳过左侧重复值
+    while (l < r && nums[r] == nums[r-1]) r--;  // 跳过右侧重复值
+    l++; r--;  // 指针移动到新位置
+}
+记录解后，跳过所有重复值确保唯一性
+
+同时移动双指针继续搜索
+
+和值过大/过小的处理
+
+cpp
+else if (sum < 0) l++;  // 和太小→左指针右移（增大和）
+else r--;               // 和太大→右指针左移（减小和）
