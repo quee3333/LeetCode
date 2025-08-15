@@ -1,0 +1,30 @@
+代码思路
+该代码实现了将 n × n 矩阵顺时针旋转 90 度的功能。思路分为两个关键步骤：
+
+矩阵转置：交换矩阵的行和列（沿主对角线翻转）
+
+水平翻转：将转置后矩阵的每一行进行反转（首尾元素依次交换）
+
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        // 获取矩阵的维度（n x n）
+        int n = matrix.size();
+
+        // 步骤1：矩阵转置（沿主对角线翻转）
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                // 交换元素 matrix[i][j] 和 matrix[j][i]
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+
+        // 步骤2：水平翻转每一行
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                // 交换当前元素与对称位置的元素
+                swap(matrix[i][j], matrix[i][n - j - 1]);
+            }
+        }
+    }
+};
