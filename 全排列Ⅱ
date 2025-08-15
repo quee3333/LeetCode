@@ -1,0 +1,49 @@
+代码思路
+排序预处理：首先对输入数组排序，使相同元素相邻，便于后续剪枝。
+
+DFS回溯：
+
+使用 used 数组标记元素是否已被使用。
+
+递归构建排列：每次选择一个未被使用的元素加入当前排列。
+
+剪枝关键：当遇到重复元素时，确保相同元素在每一层递归中只被选择一次。具体规则是：如果当前元素与前一个元素相同，且前一个元素未被使用，则跳过当前元素。
+
+终止条件：当前排列长度等于原数组长度时，保存结果并回溯。
+
+class Solution {
+    vector<vector<int>> ans;      // 存储所有不重复排列的结果
+    vector<int> conbine;          // 当前正在构建的排列（应为combine，拼写错误）
+    vector<bool> used;            // 标记元素是否被使用过
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        used = vector<bool>(nums.size()); // 初始化used数组，大小为nums.size()，默认值false
+        sort(nums.begin(), nums.end());    // 排序数组，使相同元素相邻，便于剪枝
+        dfs(nums, 0);                     // 从索引0开始DFS
+        return ans;                       // 返回结果
+    }
+
+    void dfs(vector<int>& nums, int idx) {
+        if (idx == nums.size()) {         // 终止条件：当前排列长度等于数组长度
+            ans.push_back(conbine);       // 保存当前排列
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) { // 遍历所有元素
+            if (!used[i]) {               // 如果元素未被使用
+                // 剪枝条件：跳过重复元素（确保相同元素按顺序使用）
+                if (i && nums[i-1] == nums[i] && !used[i-1]) 
+                    continue;             // 跳过当前重复元素
+
+                // 选择当前元素
+                conbine.push_back(nums[i]); 
+                used[i] = true;           // 标记为已使用
+
+                dfs(nums, idx + 1);       // 递归下一层
+
+                // 回溯：撤销选择
+                used[i] = false;          
+                conbine.pop_back();
+            }
+        }
+    }
+};
