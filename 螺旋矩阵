@@ -1,0 +1,48 @@
+思路
+本题要求按照螺旋顺序遍历二维矩阵。核心思路是模拟螺旋路径，通过维护四个边界（上、下、左、右）逐步缩小范围：
+
+初始化：设定矩阵的上下左右边界
+
+顺时针循环：
+
+从左向右遍历上边界 → 上边界下移
+
+从上向下遍历右边界 → 右边界左移
+
+从右向左遍历下边界 → 下边界上移
+
+从下向上遍历左边界 → 左边界右移
+
+终止条件：当边界交错时结束循环
+
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();  // 获取矩阵的行数m和列数n
+        int up = 0, down = m - 1, left = 0, right = n - 1;  // 初始化四个边界
+        vector<int> ans;  // 存储结果的动态数组
+        
+        while (true) {  // 持续循环直到边界交错
+            // 1. 从左向右遍历上边界
+            for (int i = left; i <= right; i++) 
+                ans.push_back(matrix[up][i]);
+            if (++up > down) break;  // 上边界下移，若超过下边界则终止
+
+            // 2. 从上向下遍历右边界
+            for (int i = up; i <= down; i++) 
+                ans.push_back(matrix[i][right]);
+            if (--right < left) break;  // 右边界左移，若小于左边界则终止
+
+            // 3. 从右向左遍历下边界
+            for (int i = right; i >= left; i--) 
+                ans.push_back(matrix[down][i]);
+            if (--down < up) break;  // 下边界上移，若小于上边界则终止
+
+            // 4. 从下向上遍历左边界
+            for (int i = down; i >= up; i--) 
+                ans.push_back(matrix[i][left]);
+            if (++left > right) break;  // 左边界右移，若超过右边界则终止
+        }
+        return ans;  // 返回螺旋遍历结果
+    }
+};
